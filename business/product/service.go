@@ -10,6 +10,11 @@ func NewService(repository Repository) Service {
 	}
 }
 
-func (s *service) findProductByID(id int) (*Product, error) {
-	return s.repository.findProductByID(id)
+func (s *service) GetProductsByCategoryID(CategoryID int) ([]Product, error) {
+	product, err := s.repository.GetProductsByCategoryID(CategoryID)
+	if err != nil {
+		return []Product{}, err
+	}
+
+	return product, err
 }

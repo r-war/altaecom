@@ -65,16 +65,19 @@ func newGormRepository(db *gorm.DB) *GormRepository {
 	}
 }
 
-func (repo *GormRepository) findProductByID(id int) (*product.Product, error) {
-	var data ProductTable
+func (repo *GormRepository) getProductsByCategoryID(CategoryID int) ([]product.Product, error) {
+	var products []ProductTable
 
-	err := repo.DB.Where("id = ?", id).First(&data).Error
+	err := repo.DB.Where("category_id = ?", CategoryID).Find(&products).Error
 
 	if err != nil {
 		return nil, err
 	}
 
-	product := data.ToProduct()
+	var result []product.Product
+	for _, val :=range products {
+		result = append(result, val.ToProduct())
+	}
 
-	return &product, nil
+	return result, nil
 }
