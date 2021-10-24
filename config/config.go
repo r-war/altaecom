@@ -1,24 +1,24 @@
 package config
 
 import (
-	"AltaEcom/modules/migration"
-	"fmt"
+	"os"
 	"sync"
 
+	"github.com/labstack/gommon/log"
 	"github.com/spf13/viper"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 )
 
 type AppConfig struct {
 	AppPort        int    `mapstructure:"app_port"`
+	AppHost        string `mapstructure:"app_host"`
 	AppEnvironment string `mapstructure:"app_environment"`
 	DbDriver       string `mapstructure:"db_driver"`
-	DbAddress      string `mapstructure:"db_address"`
+	DbHost         string `mapstructure:"db_host"`
 	DbPort         int    `mapstructure:"db_port"`
 	DbUsername     string `mapstructure:"db_username"`
 	DbPassword     string `mapstructure:"db_password"`
 	DbName         string `mapstructure:"db_name"`
+	JWTConfig      string `mapstructure:"jwt_secret"`
 }
 
 var lock = &sync.Mutex{}
@@ -34,67 +34,48 @@ func GetConfig() *AppConfig {
 	if appConfig != nil {
 		return appConfig
 	}
-	appConfig = initConfig()
+	appConfig = InitConfig()
 
 	return appConfig
 }
 
-func initConfig() *AppConfig {
+func InitConfig() *AppConfig {
 	var defaultConfig AppConfig
 
 	defaultConfig.AppPort = 8000
+	defaultConfig.AppHost = "localhost"
 	defaultConfig.AppEnvironment = ""
 	defaultConfig.DbDriver = "mongodb"
-	defaultConfig.DbAddress = "localhost"
+	defaultConfig.DbHost = "localhost"
 	defaultConfig.DbPort = 3306
 	defaultConfig.DbUsername = "root"
 	defaultConfig.DbPassword = ""
 	defaultConfig.DbName = "altaecom"
+	defaultConfig.JWTConfig = "altaecom"
 
-	viper.AutomaticEnv()
-	viper.BindEnv("app_port")
-	viper.BindEnv("app_environment")
-	viper.BindEnv("db_driver")
-	viper.BindEnv("db_address")
-	viper.BindEnv("db_port")
-	viper.BindEnv("db_username")
-	viper.BindEnv("db_password")
-	viper.BindEnv("db_name")
+	var (
+		err     error
+		curPath string
+	)
+
+	curPath, err = os.Getwd()
+	if err != nil {
+		log.Info("failed get current directory")
+		return &defaultConfig
+	}
+	viper.SetConfigFile(curPath + "/config/.env")
+	err = viper.ReadInConfig()
+	if err != nil {
+		log.Info("failed read env file")
+		return &defaultConfig
+	}
 
 	var finalConfig AppConfig
-	err := viper.Unmarshal(&finalConfig)
+	err = viper.Unmarshal(&finalConfig)
 	if err != nil {
+		log.Info("failed bind config")
 		return &defaultConfig
 	}
 
 	return &finalConfig
-}
-
-func InitDB() *gorm.DB {
-
-	config := map[string]string{
-		"DB_Username": "root",
-		"DB_Password": "",
-		"DB_Port":     "3306",
-		"DB_Host":     "127.0.0.1",
-		"DB_Name":     "altaecom",
-	}
-
-	connectString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=true&loc=local",
-		config["DB_Username"],
-		config["DB_Password"],
-		config["DB_Host"],
-		config["DB_Port"],
-		config["DB_name"])
-
-	db, e := gorm.Open(mysql.Open(connectString), &gorm.Config{})
-
-	if e != nil {
-		panic(e)
-	}
-
-	migration.InitMigrate(db)
-
-	return db
-
 }

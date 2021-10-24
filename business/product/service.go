@@ -5,9 +5,7 @@ type service struct {
 }
 
 func NewService(repository Repository) Service {
-	return &service{
-		repository,
-	}
+	return &service{repository}
 }
 
 func (s *service) GetProductsByCategoryID(CategoryID int) ([]Product, error) {

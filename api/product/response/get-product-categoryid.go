@@ -6,11 +6,11 @@ type getProductsByCategoryIDResponse struct {
 	Products []GetProductsResponse `json:"products"`
 }
 
-func newGetProductsByCategoryIDResponse(products []product.Product) getProductsByCategoryIDResponse {
+func NewGetProductsByCategoryIDResponse(products []product.Product) getProductsByCategoryIDResponse {
 
 	getProductsByCategoryIDResponse := getProductsByCategoryIDResponse{}
 
-	for _, val :=range products {
+	for _, val := range products {
 		var getProductsResponse GetProductsResponse
 
 		getProductsResponse.ID = val.ID
@@ -21,8 +21,8 @@ func newGetProductsByCategoryIDResponse(products []product.Product) getProductsB
 		getProductsResponse.Description = val.Description
 		getProductsResponse.Image = val.Image
 
-		getProductsByCategoryIDResponse.Products = append(getProductsByCategoryIDResponse.Products, getProductsResponse )
-	}	
+		getProductsByCategoryIDResponse.Products = append(getProductsByCategoryIDResponse.Products, getProductsResponse)
+	}
 
 	if getProductsByCategoryIDResponse.Products == nil {
 		getProductsByCategoryIDResponse.Products = []GetProductsResponse{}

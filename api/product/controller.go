@@ -1,7 +1,8 @@
-package customer
+package product
 
 import (
-	"AltaEcom/business/customer"
+	"AltaEcom/api/product/response"
+	"AltaEcom/business/product"
 	"net/http"
 	"strconv"
 
@@ -9,16 +10,16 @@ import (
 )
 
 type Controller struct {
-	service customer.Service
+	service product.Service
 }
 
-func newController (service customer.Service) *Controller {
+func NewController(service product.Service) *Controller {
 	return &Controller{
 		service,
 	}
 }
 
-func (controller *Controller) getProductsByCategoryID(c echo.Context) error {
+func (controller *Controller) GetProductsByCategoryID(c echo.Context) error {
 
 	query := c.QueryParam("category_id")
 	id, _ := strconv.Atoi(query)
@@ -26,10 +27,10 @@ func (controller *Controller) getProductsByCategoryID(c echo.Context) error {
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNoContent, err.Error())
-	} 
+	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message" : "success",
-		"products" : products,
+		"message":  "success",
+		"products": response.NewGetProductsByCategoryIDResponse(products).Products,
 	})
 }

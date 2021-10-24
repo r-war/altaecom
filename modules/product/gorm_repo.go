@@ -8,26 +8,26 @@ import (
 	"gorm.io/gorm"
 )
 
-type GormRepository struct {
+type Repository struct {
 	DB *gorm.DB
 }
 
-type ProductTable struct {
-	ID          int                    `gorm:"id"`
-	CategoryId  int                    `gorm:"category_id"`
-	Name        string                 `gorm:"name"`
-	Price       int                    `gorm:"price"`
-	Qty         int                    `gorm:"qty"`
-	Description string                 `gorm:"description"`
-	Image       string                 `gorm:"image"`
-	CreatedAt   time.Time              `gorm:"created_at"`
-	UpdatedAt   time.Time              `gorm:"updated_at"`
-	DeletedAt   time.Time              `gorm:"DeletedAt"`
-	Category    category.CategoryTable `gorm:"foreignkey:CategoryId"`
+type Product struct {
+	ID          int               `gorm:"id;primaryKey;autoIncrement"`
+	CategoryId  int               `gorm:"category_id"`
+	Name        string            `gorm:"name"`
+	Price       int               `gorm:"price"`
+	Qty         int               `gorm:"qty"`
+	Description string            `gorm:"description"`
+	Image       string            `gorm:"image"`
+	CreatedAt   time.Time         `gorm:"created_at"`
+	UpdatedAt   time.Time         `gorm:"updated_at"`
+	DeletedAt   time.Time         `gorm:"DeletedAt"`
+	Category    category.Category `gorm:"foreignkey:CategoryId"`
 }
 
-func newProductTable(product product.Product) *ProductTable {
-	return &ProductTable{
+func newProductTable(product product.Product) *Product {
+	return &Product{
 		product.ID,
 		product.CategoryId,
 		product.Name,
@@ -38,45 +38,44 @@ func newProductTable(product product.Product) *ProductTable {
 		product.CreatedAt,
 		product.UpdatedAt,
 		product.DeletedAt,
-		category.CategoryTable{},
+		category.Category{},
 	}
 }
 
-func (col *ProductTable) ToProduct() product.Product {
-	var product product.Product
-
-	product.ID = col.ID
-	product.CategoryId = col.CategoryId
-	product.Name = col.Name
-	product.Price = col.Price
-	product.Qty = col.Qty
-	product.Description = col.Description
-	product.Image = col.Image
-	product.CreatedAt = col.CreatedAt
-	product.UpdatedAt = col.UpdatedAt
-	product.DeletedAt = col.DeletedAt
-
-	return product
-}
-
-func newGormRepository(db *gorm.DB) *GormRepository {
-	return &GormRepository{
-		db,
+func (col *Product) ToProduct() product.Product {
+	return product.Product{
+		ID:          col.ID,
+		CategoryId:  col.CategoryId,
+		Name:        col.Name,
+		Price:       col.Price,
+		Qty:         col.Qty,
+		Description: col.Description,
+		Image:       col.Image,
+		CreatedAt:   col.CreatedAt,
+		UpdatedAt:   col.UpdatedAt,
+		DeletedAt:   col.DeletedAt,
 	}
 }
 
-func (repo *GormRepository) getProductsByCategoryID(CategoryID int) ([]product.Product, error) {
-	var products []ProductTable
+func NewRepository(db *gorm.DB) *Repository {
+	return &Repository{db}
+}
 
-	err := repo.DB.Where("category_id = ?", CategoryID).Find(&products).Error
+func (repo *Repository) GetProductsByCategoryID(CategoryID int) ([]product.Product, error) {
+	var products []Product
+
+	err := repo.DB.Preload("Categories").Joins("inner join categories on products.category_id = category.id").Where("category_id = ?", CategoryID).Find(&products).Error
 
 	if err != nil {
 		return nil, err
 	}
 
 	var result []product.Product
-	for _, val :=range products {
-		result = append(result, val.ToProduct())
+	var temp product.Product
+	for _, val := range products {
+		temp = val.ToProduct()
+		temp.CategoryName = val.Category.Name
+		result = append(result, temp)
 	}
 
 	return result, nil

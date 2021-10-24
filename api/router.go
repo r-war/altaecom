@@ -1,7 +1,20 @@
 package api
 
-import "github.com/labstack/echo/v4"
+import (
+	"AltaEcom/api/product"
 
-func RegisterPath(e *echo.Echo) {
+	"github.com/labstack/echo/v4"
+)
+
+func RegisterPath(
+	e *echo.Echo,
+	productController *product.Controller,
+) {
+	if productController == nil {
+		panic("invalid parameter")
+	}
+
+	product := e.Group("/products")
+	product.GET("", productController.GetProductsByCategoryID)
 
 }

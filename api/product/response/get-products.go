@@ -9,15 +9,15 @@ type GetProductsResponse struct {
 	CategoryID  int    `json:"category_id"`
 	Name        string `json:"name"`
 	Price       int    `json:"price"`
-	Qty         int    `json:"qty:`
+	Qty         int    `json:"qty"`
 	Description string `json:"description"`
 	Image       string `json:"image"`
 	//UpdatedAt   time.Time `json:"updated_at`
 }
 
-func newGetProductsResponse(product product.Product) *GetProductsResponse {
+func NewGetProductsResponse(product product.Product) *GetProductsResponse {
 	var response GetProductsResponse
-	
+
 	response.ID = product.ID
 	response.CategoryID = product.CategoryId
 	response.Name = product.Name
