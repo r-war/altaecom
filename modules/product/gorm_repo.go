@@ -80,3 +80,75 @@ func (repo *Repository) GetProductsByCategoryID(CategoryID int) ([]product.Produ
 
 	return result, nil
 }
+
+func (repo *Repository) GetProducts() ([]product.Product, error) {
+	var products []Product
+
+	err := repo.DB.Find(&products).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var result []product.Product
+	for _, val := range products {
+		result = append(result, val.ToProduct())
+	}
+	return result, nil
+}
+
+func (repo *Repository) FindProductByid(id int) (*product.Product, error) {
+	var product Product
+
+	err := repo.DB.First(product, "id = ?", id).Error
+	if err != nil {
+		return nil, err
+	}
+	result := product.ToProduct()
+	return &result, nil
+}
+
+func (repo *Repository) InsertProduct(product product.Product) error {
+	productData := newProductTable(product)
+
+	if err := repo.DB.Create(productData).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo *Repository) UpdateProduct(id int, product product.Product) error {
+	var productData Product
+	err := repo.DB.Find(productData, "id = ?", id).Error
+
+	if err != nil {
+		return err
+	}
+	err = repo.DB.Model(productData).Updates(Product{
+		Name:        product.Name,
+		CategoryId:  product.CategoryId,
+		Price:       product.Price,
+		Qty:         product.Qty,
+		Description: product.Description,
+		UpdatedAt:   time.Now(),
+	}).Error
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo *Repository) DeleteProduct(id int) error {
+	var productData Product
+
+	err := repo.DB.First(productData, "id = ?", id).Error
+	if err != nil {
+		return err
+	}
+	err = repo.DB.Model(productData).Updates(Product{DeletedAt: time.Now()}).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -4,7 +4,7 @@ import (
 	"AltaEcom/business/product"
 )
 
-type GetProductsResponse struct {
+type GetProductResponse struct {
 	ID          int    `json:"id"`
 	CategoryID  int    `json:"category_id"`
 	Name        string `json:"name"`
@@ -15,8 +15,8 @@ type GetProductsResponse struct {
 	//UpdatedAt   time.Time `json:"updated_at`
 }
 
-func NewGetProductsResponse(product product.Product) *GetProductsResponse {
-	var response GetProductsResponse
+func NewGetProductResponse(product product.Product) *GetProductResponse {
+	var response GetProductResponse
 
 	response.ID = product.ID
 	response.CategoryID = product.CategoryId

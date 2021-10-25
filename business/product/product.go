@@ -17,7 +17,6 @@ type Product struct {
 }
 
 func NewProduct(
-	ID int,
 	CategoryId int,
 	Name string,
 	Price int,
@@ -25,11 +24,9 @@ func NewProduct(
 	Description string,
 	Image string,
 	CreatedAt time.Time,
-	UpdatedAt time.Time,
-	DeletedAt time.Time) Product {
+	UpdatedAt time.Time) Product {
 
 	return Product{
-		ID:          ID,
 		CategoryId:  CategoryId,
 		Name:        Name,
 		Price:       Price,
@@ -38,6 +35,25 @@ func NewProduct(
 		Image:       Image,
 		CreatedAt:   CreatedAt,
 		UpdatedAt:   UpdatedAt,
-		DeletedAt:   DeletedAt,
+	}
+}
+
+func ModifyProduct(
+	name string,
+	price int,
+	categoryId int,
+	qty int,
+	description string,
+	image string,
+	updateAt time.Time,
+) Product {
+	return Product{
+		Name:        name,
+		Price:       price,
+		CategoryId:  categoryId,
+		Qty:         qty,
+		Description: description,
+		Image:       image,
+		UpdatedAt:   updateAt,
 	}
 }
