@@ -12,7 +12,7 @@ type ProductSpec struct {
 	Description string
 	Price       int
 	Qty         int
-	image       string
+	Image       string
 	CategoryID  int
 	adminID     int
 }
@@ -57,7 +57,7 @@ func (s *service) InsertProduct(product *ProductSpec) error {
 		product.Price,
 		product.Qty,
 		product.Description,
-		product.image,
+		product.Image,
 		time.Now(),
 		time.Now())
 
@@ -88,7 +88,7 @@ func (s *service) UpdateProduct(id int, updateProduct *ProductSpec) error {
 		updateProduct.CategoryID,
 		updateProduct.Qty,
 		updateProduct.Description,
-		updateProduct.image,
+		updateProduct.Image,
 		time.Now(),
 	)
 	return s.repository.UpdateProduct(id, dataProduct)

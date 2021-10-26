@@ -23,10 +23,10 @@ type Controller struct {
 }
 
 //NewController Construct item API controller
-func NewController(service auth.Service, cfg config.AppConfig) *Controller {
+func NewController(service auth.Service, cfg *config.AppConfig) *Controller {
 	return &Controller{
 		service,
-		cfg,
+		*cfg,
 	}
 }
 

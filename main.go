@@ -2,11 +2,25 @@ package main
 
 import (
 	"AltaEcom/api"
-	productController "AltaEcom/api/product"
-	productService "AltaEcom/business/product"
 	"AltaEcom/config"
 	"AltaEcom/modules/migration"
+
+	authController "AltaEcom/api/auth"
+	categoryController "AltaEcom/api/category"
+	productController "AltaEcom/api/product"
+	userController "AltaEcom/api/user"
+
+	adminService "AltaEcom/business/admin"
+	authService "AltaEcom/business/auth"
+	categoryService "AltaEcom/business/category"
+	productService "AltaEcom/business/product"
+	userService "AltaEcom/business/user"
+
+	adminRepository "AltaEcom/modules/admin"
+	categoryRepository "AltaEcom/modules/category"
 	productRepository "AltaEcom/modules/product"
+	userRepository "AltaEcom/modules/user"
+
 	"fmt"
 
 	"github.com/labstack/echo/v4"
@@ -49,16 +63,48 @@ func main() {
 
 	dbConnect := DBConnection(cfg)
 
+	//initiate user repository
+	userRepo := userRepository.NewGormDBRepository(dbConnect)
+
+	//initiate user service
+	userService := userService.NewService(userRepo)
+
+	//initiate user controller
+	userController := userController.NewController(userService)
+	
+	
+	//admin
+	adminRepo := adminRepository.NewGormDBRepository(dbConnect)
+
+	adminService := adminService.NewService(adminRepo)
+
+	//auth
+	authService := authService.NewService(userService, adminService, adminRepo, userRepo, cfg)
+	authController := authController.NewController(authService, cfg)
+
+	//product
 	productRepo := productRepository.NewRepository(dbConnect)
 
-	productService := productService.NewService(productRepo)
+	productService := productService.NewService(adminService, productRepo)
 
 	productController := productController.NewController(productService)
+
+	//category
+	categoryRepo := categoryRepository.NewGormDBRepository(dbConnect)
+
+	categoryService := categoryService.NewService(adminService, categoryRepo)
+
+	categoryController := categoryController.NewController(categoryService)
 
 	e := echo.New()
 	api.RegisterPath(
 		e,
+		userController,
+		authController,
 		productController,
+		categoryController,
+
+		cfg,
 	)
 
 	func() {

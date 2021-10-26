@@ -42,7 +42,7 @@ func (c *Controller) GetProducts(ctx echo.Context) error {
 	if err != nil {
 		return ctx.JSON(common.NewErrorBusinessResponse(err))
 	}
-	return ctx.JSON(common.BusinessResponse(
+	return ctx.JSON(common.NewSuccessResponse(
 		response.NewGetProductsResponse(products).Products,
 	))
 }
@@ -61,11 +61,40 @@ func (c *Controller) FindProductByid(ctx echo.Context) error {
 
 func (c *Controller) InsertProduct(ctx echo.Context) error {
 	var err error
-	insertProduct := new(request.ProductRequest)
+	insertProduct := new(request.InsertProductRequest)
 	if err = ctx.Bind(insertProduct); err != nil {
 		return ctx.JSON(common.NewErrorBusinessResponse(err))
 	}
-	if err = c.service.InsertProduct(insertProduct); err != nil {
+	if err = c.service.InsertProduct(insertProduct.ToProductSpec()); err != nil {
+		return ctx.JSON(common.NewErrorBusinessResponse(err))
+	}
+
+	return ctx.JSON(common.NewSuccessResponseWithoutData())
+}
+
+func (c *Controller) UpdateProduct(ctx echo.Context) error {
+	var err error
+	id, _ := strconv.Atoi(ctx.Param("id"))
+
+	updateProduct := new(request.UpdateProductRequest)
+
+	if err = ctx.Bind(updateProduct);err != nil {
+		return ctx.JSON(common.NewBadRequestResponse())
+	}
+
+	err = c.service.UpdateProduct(id, updateProduct.ToProductSpec())
+	if err != nil {
+		return ctx.JSON(common.NewErrorBusinessResponse(err))
+	}
+
+	return ctx.JSON(common.NewSuccessResponseWithoutData())
+}
+
+func (c *Controller) DeleteProduct(ctx echo.Context) error {
+	id, _ := strconv.Atoi(ctx.Param("id"))
+	adminID, _ := strconv.Atoi(ctx.Param("adminID"))
+
+	if err:= c.service.DeleteProduct(id, adminID); err != nil {
 		return ctx.JSON(common.NewErrorBusinessResponse(err))
 	}
 

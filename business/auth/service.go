@@ -20,13 +20,13 @@ type service struct {
 }
 
 //NewService Construct user service object
-func NewService(userService user.Service, adminService admin.Service, adminRepo admin.Repository, userRepo user.Repository, cfg config.AppConfig) Service {
+func NewService(userService user.Service, adminService admin.Service, adminRepo admin.Repository, userRepo user.Repository, cfg *config.AppConfig) Service {
 	return &service{
 		userService,
 		adminService,
 		adminRepo,
 		userRepo,
-		cfg,
+		*cfg,
 	}
 }
 
