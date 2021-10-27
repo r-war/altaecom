@@ -1,4 +1,4 @@
-name : ci/cd process
+name: ci/cd process
 
 on:
   push:
