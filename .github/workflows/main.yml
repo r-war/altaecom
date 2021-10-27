@@ -25,6 +25,11 @@ jobs:
     needs: unit-test
     steps:
       - uses: actions/checkout@v2
+      - name: generate config file
+        env:
+          CONFIG: ${{secrets.APP_CONFIG}}
+        run: |
+          echo "$CONFIG" > ~/config/.env
       - name: build image
         run: docker build -t alcantroz/altaecom:latest
       - name: login docker hub
