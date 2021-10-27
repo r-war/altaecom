@@ -49,7 +49,7 @@ func InitConfig() *AppConfig {
 	defaultConfig.DbHost = "localhost"
 	defaultConfig.DbPort = 3306
 	defaultConfig.DbUsername = "root"
-	defaultConfig.DbPassword = ""
+	defaultConfig.DbPassword = "1234"
 	defaultConfig.DbName = "altaecom"
 	defaultConfig.JWTConfig = "altaecom"
 
@@ -63,7 +63,7 @@ func InitConfig() *AppConfig {
 		log.Info("failed get current directory")
 		return &defaultConfig
 	}
-	viper.SetConfigFile(curPath + "/config/.env")
+	viper.SetConfigFile(curPath + "/../config/.env")
 	err = viper.ReadInConfig()
 	if err != nil {
 		log.Info("failed read env file")

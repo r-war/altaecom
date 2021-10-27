@@ -19,24 +19,23 @@ func RegisterPath(
 	categoryController *category.Controller,
 	cfg *config.AppConfig,
 ) {
-	if authController == nil || userController == nil  {
+	if authController == nil || userController == nil {
 		panic("Controller parameter cannot be nil")
 	}
 
 	//authentication with Versioning endpoint
-	authV1 := e.Group("api/v1/auth")
+	authV1 := e.Group("api/auth")
 	authV1.POST("/login", authController.Login)
 	authV1.POST("/register-admin", authController.RegisterAdmin)
 	authV1.POST("/register-user", authController.RegisterUser)
 
 	//user with Versioning endpoint
-	userV1 := e.Group("api/v1/users")
+	userV1 := e.Group("api/users")
 	userV1.Use(middleware.JWTMiddleware(*cfg))
 	userV1.GET("/:id", userController.FindUserByID)
 	userV1.GET("", userController.FindAllUser)
 	userV1.POST("", userController.InsertUser)
 	userV1.PUT("/:id", userController.UpdateUser)
-
 
 	//health check
 	e.GET("/health", func(c echo.Context) error {
