@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"AltaEcom/config"
+	"fmt"
 
 	"github.com/golang-jwt/jwt"
 
@@ -11,7 +12,7 @@ import (
 
 type JwtCustomClaims struct {
 	Name    string `json:"name"`
-	ID      int    `json:"id"`
+	ID      int    `json:"id" `
 	Email   string `json:"email"`
 	IsAdmin bool   `json:"is_admin"`
 	jwt.StandardClaims
@@ -24,6 +25,7 @@ type contextKey struct {
 }
 
 func JWTMiddleware(cfg config.AppConfig) echo.MiddlewareFunc {
+	fmt.Println(cfg.JWTConfig, "ok")
 	return middleware.JWTWithConfig(middleware.JWTConfig{
 		SigningMethod: "HS256",
 		Claims:        &JwtCustomClaims{},
@@ -41,4 +43,10 @@ func isAdmin(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 		return next(c)
 	}
+}
+
+// GetTokenFromContext return Token Object inside context data
+func GetTokenFromContext(c echo.Context) *JwtCustomClaims {
+	raw, _ := c.Get("user").(*jwt.Token)
+	return raw.Claims.(*JwtCustomClaims)
 }

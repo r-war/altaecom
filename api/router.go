@@ -4,6 +4,7 @@ import (
 	"AltaEcom/api/auth"
 	"AltaEcom/api/category"
 	"AltaEcom/api/middleware"
+	"AltaEcom/api/order"
 	"AltaEcom/api/product"
 	"AltaEcom/api/user"
 	"AltaEcom/config"
@@ -17,6 +18,7 @@ func RegisterPath(
 	authController *auth.Controller,
 	productController *product.Controller,
 	categoryController *category.Controller,
+	orderController *order.Controller,
 	cfg *config.AppConfig,
 ) {
 	if authController == nil || userController == nil {
@@ -36,6 +38,27 @@ func RegisterPath(
 	userV1.GET("", userController.FindAllUser)
 	userV1.POST("", userController.InsertUser)
 	userV1.PUT("/:id", userController.UpdateUser)
+
+	categoryV1 := e.Group("api/category")
+	categoryV1.Use(middleware.JWTMiddleware(*cfg))
+	categoryV1.GET("/:id", userController.FindUserByID)
+	categoryV1.GET("", userController.FindAllUser)
+	categoryV1.POST("", userController.InsertUser)
+	categoryV1.PUT("/:id", userController.UpdateUser)
+
+	productV1 := e.Group("api/product")
+	productV1.Use(middleware.JWTMiddleware(*cfg))
+	productV1.GET("/:id", userController.FindUserByID)
+	productV1.GET("", userController.FindAllUser)
+	productV1.POST("", userController.InsertUser)
+	productV1.PUT("/:id", userController.UpdateUser)
+
+	orderV1 := e.Group("api/cart")
+	orderV1.Use(middleware.JWTMiddleware(*cfg))
+	orderV1.GET("", orderController.GetOrderByUserID)
+	orderV1.POST("", orderController.NewOrderByUserID)
+	orderV1.POST("/add", orderController.GetOrderByUserID)
+	orderV1.POST("/update", orderController.GetOrderByUserID)
 
 	//health check
 	e.GET("/health", func(c echo.Context) error {

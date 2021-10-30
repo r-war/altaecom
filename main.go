@@ -7,17 +7,20 @@ import (
 
 	authController "AltaEcom/api/auth"
 	categoryController "AltaEcom/api/category"
+	orderController "AltaEcom/api/order"
 	productController "AltaEcom/api/product"
 	userController "AltaEcom/api/user"
 
 	adminService "AltaEcom/business/admin"
 	authService "AltaEcom/business/auth"
 	categoryService "AltaEcom/business/category"
+	orderService "AltaEcom/business/order"
 	productService "AltaEcom/business/product"
 	userService "AltaEcom/business/user"
 
 	adminRepository "AltaEcom/modules/admin"
 	categoryRepository "AltaEcom/modules/category"
+	orderRepo "AltaEcom/modules/order"
 	productRepository "AltaEcom/modules/product"
 	userRepository "AltaEcom/modules/user"
 
@@ -71,8 +74,7 @@ func main() {
 
 	//initiate user controller
 	userController := userController.NewController(userService)
-	
-	
+
 	//admin
 	adminRepo := adminRepository.NewGormDBRepository(dbConnect)
 
@@ -96,6 +98,12 @@ func main() {
 
 	categoryController := categoryController.NewController(categoryService)
 
+	orderRepo := orderRepo.NewRepository(dbConnect)
+
+	orderService := orderService.NewService(orderRepo)
+
+	orderController := orderController.NewController(orderService)
+
 	e := echo.New()
 	api.RegisterPath(
 		e,
@@ -103,12 +111,12 @@ func main() {
 		authController,
 		productController,
 		categoryController,
-
+		orderController,
 		cfg,
 	)
 
 	func() {
-		address := fmt.Sprintf(":%d", cfg.AppPort)
+		address := fmt.Sprintf("%s:%d", cfg.AppHost, cfg.AppPort)
 
 		if err := e.Start(address); err != nil {
 			log.Info("Shutdown Echo Service")

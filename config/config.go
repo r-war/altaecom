@@ -42,7 +42,7 @@ func GetConfig() *AppConfig {
 func InitConfig() *AppConfig {
 	var defaultConfig AppConfig
 
-	defaultConfig.AppPort = 8000
+	defaultConfig.AppPort = 9092
 	defaultConfig.AppHost = "localhost"
 	defaultConfig.AppEnvironment = ""
 	defaultConfig.DbDriver = "mongodb"
@@ -63,7 +63,8 @@ func InitConfig() *AppConfig {
 		log.Info("failed get current directory")
 		return &defaultConfig
 	}
-	viper.SetConfigFile(curPath + "/../config/.env")
+	viper.SetConfigFile(curPath + "/config/.env")
+	// viper.SetConfigFile(curPath + "/../config/.env")
 	err = viper.ReadInConfig()
 	if err != nil {
 		log.Info("failed read env file")

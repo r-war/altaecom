@@ -3,6 +3,7 @@ package migration
 import (
 	admin "AltaEcom/modules/admin"
 	category "AltaEcom/modules/category"
+	order "AltaEcom/modules/order"
 	product "AltaEcom/modules/product"
 	user "AltaEcom/modules/user"
 
@@ -11,8 +12,10 @@ import (
 
 func InitMigrate(db *gorm.DB) {
 	db.AutoMigrate(
-		&product.Product{}, 
+		&product.Product{},
 		&category.Category{},
 		&admin.Admin{},
-		&user.User{})
+		&user.User{},
+		&order.Order{},
+	)
 }

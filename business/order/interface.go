@@ -1,31 +1,33 @@
 package order
 
+import "time"
+
 type Service interface {
-	GetOrderByUserID(id int) (Order, error)
+	GetOrderByUserID(userID int) (*Order, error)
 
-	GetOrderItemByUserID(id int) (OrderDetail, error)
+	GetOrderItemByUserID(id int) (*OrderDetail, error)
 
-	NewOrder(userID int) (Order, error)
+	NewOrderByUserID(userID int) (*Order, error)
 
-	AddItemToOrder(orderID int, product Item) error
+	AddItemToOrder(orderID int, product *OrderItemSpec) error
 
-	UpdateItemInOrder(orderID int, product Item) error
+	UpdateItemInOrder(orderID int, product OrderItem) error
 
 	RemoveItemInOrder(OrderID int, productID int) error
 }
 
 type Repository interface {
-	GetOrderByUserID(id int) (Order, error)
+	GetOrderByUserID(userID int) (*Order, error)
 
-	NewOrder(userID int) (Order, error)
+	NewOrderByUserID(userID int, createdAt time.Time) (*Order, error)
 }
 
 type RepositoryOrderItem interface {
-	GetOrderItemByUserID(id int) (OrderDetail, error)
+	GetOrderItemByOrderID(orderID int) (*[]OrderItem, error)
 
-	AddItemToOrder(orderID int, product Item) error
+	AddItemToOrder(orderID int, product OrderItem) error
 
-	UpdateItemInOrder(orderID int, product Item) error
+	UpdateItemInOrder(orderID int, product OrderItem) error
 
 	RemoveItemInOrder(orderID int, productID int) error
 }

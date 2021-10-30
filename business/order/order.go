@@ -2,23 +2,85 @@ package order
 
 import "time"
 
-type Item struct {
+type OrderItem struct {
 	ID          int
+	OrderID     int
 	ProductID   int
 	ProductName string
+	Price       int
 	Qty         int
-	UpdateAt    time.Time
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 type Order struct {
-	ID int
-	Status bool
+	ID        int
+	UserID    int
+	Status    bool
 	CreatedAt time.Time
-	UpdateAt time.Time
+	UpdatedAt time.Time
 }
 
 type OrderDetail struct {
-	ID int
-	Items []Item
-	CreatedAt time.Time
+	ID        int
+	UserID    int
+	Items     []OrderItem
+	UpdatedAt time.Time
+}
+
+func NewOrderItem(
+	ProductID int,
+	OrderID int,
+	Price int,
+	Qty int,
+	CreatedAt time.Time,
+	UpdatedAt time.Time) OrderItem {
+	return OrderItem{
+		ProductID: ProductID,
+		OrderID:   OrderID,
+		Price:     Price,
+		Qty:       Qty,
+		CreatedAt: CreatedAt,
+		UpdatedAt: UpdatedAt,
+	}
+}
+
+func ModifyOrderItem(
+	Qty int,
+) OrderItem {
+	return OrderItem{
+		Qty:       Qty,
+		UpdatedAt: time.Now(),
+	}
+}
+
+func NewOrder(
+	UserID int,
+	Status bool,
+	CreatedAt time.Time) *Order {
+	return &Order{
+		UserID:    UserID,
+		Status:    Status,
+		CreatedAt: CreatedAt,
+	}
+}
+
+func NewOrderDetail(
+	Order *Order,
+	items *[]OrderItem,
+) *OrderDetail {
+	var orderDetail OrderDetail
+
+	orderDetail.ID = Order.ID
+	orderDetail.UserID = Order.UserID
+	orderDetail.UpdatedAt = Order.UpdatedAt
+
+	for _, val := range *items {
+		orderDetail.Items = append(orderDetail.Items, val)
+	}
+	if orderDetail.Items == nil {
+		orderDetail.Items = []OrderItem{}
+	}
+
+	return &orderDetail
 }
