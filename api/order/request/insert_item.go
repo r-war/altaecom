@@ -15,10 +15,11 @@ type OrderItemRequest struct {
 func (ins OrderItemRequest) ToProductSpec() *order.OrderItemSpec {
 	var spec order.OrderItemSpec
 
-	spec.OrderID = ins.OrderID
+	spec.ID = ins.ID
 	spec.ProductID = ins.ProductID
 	spec.Price = ins.Price
 	spec.Qty = ins.Qty
+	spec.OrderID = ins.OrderID
 
 	return &spec
 }

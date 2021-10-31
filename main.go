@@ -21,6 +21,7 @@ import (
 	adminRepository "AltaEcom/modules/admin"
 	categoryRepository "AltaEcom/modules/category"
 	orderRepo "AltaEcom/modules/order"
+	orderItemRepo "AltaEcom/modules/orderitem"
 	productRepository "AltaEcom/modules/product"
 	userRepository "AltaEcom/modules/user"
 
@@ -98,9 +99,11 @@ func main() {
 
 	categoryController := categoryController.NewController(categoryService)
 
+	//order
 	orderRepo := orderRepo.NewRepository(dbConnect)
+	orderItemRepo := orderItemRepo.NewRepository(dbConnect)
 
-	orderService := orderService.NewService(orderRepo)
+	orderService := orderService.NewService(orderRepo, orderItemRepo)
 
 	orderController := orderController.NewController(orderService)
 

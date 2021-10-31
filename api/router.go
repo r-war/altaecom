@@ -57,8 +57,9 @@ func RegisterPath(
 	orderV1.Use(middleware.JWTMiddleware(*cfg))
 	orderV1.GET("", orderController.GetOrderByUserID)
 	orderV1.POST("", orderController.NewOrderByUserID)
-	orderV1.POST("/add", orderController.GetOrderByUserID)
-	orderV1.POST("/update", orderController.GetOrderByUserID)
+	orderV1.POST("/add", orderController.AddItemToOrder)
+	orderV1.POST("/update", orderController.UpdateItemInOrder)
+	orderV1.DELETE("/delete/:productid", orderController.RemoveItemInOrder)
 
 	//health check
 	e.GET("/health", func(c echo.Context) error {

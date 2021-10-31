@@ -1,6 +1,8 @@
 package orderitem
 
 import (
+	"AltaEcom/business/order"
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -30,9 +32,10 @@ func NewRepository(db *gorm.DB) *Repository {
 }
 func NewOrderItemTable(
 	cartID int,
-	item OrderItem,
-) OrderItem {
-	return OrderItem{
+	item order.OrderItem,
+) *OrderItem {
+	return &OrderItem{
+		ID:        item.ID,
 		OrderID:   cartID,
 		ProductID: item.ProductID,
 		Qty:       item.Qty,
@@ -42,36 +45,60 @@ func NewOrderItemTable(
 	}
 }
 
-func (r *Repository) AddItemToOrder(orderID int, item OrderItem) error {
-	err := r.DB.Create(NewOrderItemTable(orderID, item))
+func (col *OrderItem) ToOrderItem() order.OrderItem {
+	return order.OrderItem{
+		ID:        col.ID,
+		OrderID:   col.OrderID,
+		ProductID: col.ProductID,
+		Qty:       col.Qty,
+		Price:     col.Price,
+		CreatedAt: col.CreatedAt,
+		UpdatedAt: col.UpdatedAt,
+	}
+}
+
+func (r *Repository) AddItemToOrder(orderID int, item order.OrderItem) error {
+	err := r.DB.Create(NewOrderItemTable(orderID, item)).Error
 
 	if err != nil {
-		return gorm.ErrDryRunModeUnsupported
+		return err
 	}
 
 	return nil
 }
 
-func (r *Repository) GetOrderItemByUserID(OrderID int) (*[]OrderItemWithProductName, error) {
-	var itemsDetail *[]OrderItemWithProductName
+func (r *Repository) GetOrderItemByUserID(OrderID int) (*[]order.OrderItem, error) {
+	var itemsDetail *[]OrderItem
 
 	err := r.DB.Raw("select t1.*, t2.name product_name from order_item t1 inner join products t2 on t2.id = t1.product_id where t1.order_id = ?", OrderID).Scan(itemsDetail).Error
 
 	if err != nil {
 		return nil, err
 	}
-	return itemsDetail, nil
+
+	fmt.Println(itemsDetail)
+	var result []order.OrderItem
+	var temp order.OrderItem
+	for _, val := range *itemsDetail {
+		temp = val.ToOrderItem()
+		//temp.ProductName = val.product.name
+		result = append(result, temp)
+	}
+	return &result, nil
 }
 
-func (r *Repository) UpdateItemInOrder(orderID int, item OrderItem) error {
+func (r *Repository) UpdateItemInOrder(orderID int, item order.OrderItem) error {
 	var orderItem OrderItem
 
-	err := r.DB.Where("order_id = ? and id = ?", orderID, item.ID).Find(orderItem).Error
+	err := r.DB.Find(&orderItem, "order_id = ? and id = ?", orderID, item.ID).Error
+	// err := r.DB.Where("order_id = ? and id = ?", orderID, item.ID).First(&orderItem).Error
 	if err != nil {
 		return err
 	}
 
-	r.DB.Model(orderItem).Updates(OrderItem{
+	r.DB.Model(&orderItem).Updates(OrderItem{
+		ID:        item.ID,
+		ProductID: item.ProductID,
 		Price:     item.Price,
 		Qty:       item.Qty,
 		UpdatedAt: time.Now(),
@@ -83,12 +110,12 @@ func (r *Repository) UpdateItemInOrder(orderID int, item OrderItem) error {
 func (r *Repository) RemoveItemInOrder(orderID int, productID int) error {
 	var orderItem OrderItem
 
-	err := r.DB.Where("order_id = ? and product_id = ? ", orderID, productID).Find(orderItem).Error
+	err := r.DB.Where("order_id = ? and product_id = ? ", orderID, productID).Find(&orderItem).Error
 
 	if err != nil {
 		return err
 	}
 
-	r.DB.Delete(orderItem)
+	r.DB.Delete(&orderItem)
 	return nil
 }

@@ -11,7 +11,7 @@ type Service interface {
 
 	AddItemToOrder(orderID int, product *OrderItemSpec) error
 
-	UpdateItemInOrder(orderID int, product OrderItem) error
+	UpdateItemInOrder(orderID int, product *OrderItemSpec) error
 
 	RemoveItemInOrder(OrderID int, productID int) error
 }
@@ -23,7 +23,7 @@ type Repository interface {
 }
 
 type RepositoryOrderItem interface {
-	GetOrderItemByOrderID(orderID int) (*[]OrderItem, error)
+	GetOrderItemByUserID(orderID int) (*[]OrderItem, error)
 
 	AddItemToOrder(orderID int, product OrderItem) error
 

@@ -3,6 +3,7 @@ package order
 import (
 	"AltaEcom/business"
 	"AltaEcom/util/validator"
+	"fmt"
 	"time"
 )
 
@@ -12,6 +13,7 @@ type OrderSpec struct {
 }
 
 type OrderItemSpec struct {
+	ID        int
 	ProductID int
 	OrderID   int
 	Price     int
@@ -42,7 +44,7 @@ func (s *service) GetOrderItemByUserID(id int) (*OrderDetail, error) {
 		return nil, err
 	}
 
-	allItems, err := s.repoOrderItem.GetOrderItemByOrderID(id)
+	allItems, err := s.repoOrderItem.GetOrderItemByUserID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -67,8 +69,20 @@ func (s *service) AddItemToOrder(orderID int, product *OrderItemSpec) error {
 	return s.repoOrderItem.AddItemToOrder(orderID, data)
 }
 
-func (s *service) UpdateItemInOrder(orderID int, product OrderItem) error {
-	return s.repoOrderItem.UpdateItemInOrder(orderID, product)
+func (s *service) UpdateItemInOrder(orderID int, product *OrderItemSpec) error {
+	if err := validator.GetValidator().Struct(product); err != nil {
+		return business.ErrInvalidSpec
+	}
+
+	fmt.Println(product)
+	data := ModifyOrderItem(
+		product.ID,
+		product.ProductID,
+		product.Qty,
+		product.Price,
+	)
+
+	return s.repoOrderItem.UpdateItemInOrder(orderID, data)
 }
 
 func (s *service) RemoveItemInOrder(orderID int, productID int) error {

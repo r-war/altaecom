@@ -6,6 +6,8 @@ import (
 	"AltaEcom/api/order/request"
 	"AltaEcom/api/order/response"
 	"AltaEcom/business/order"
+	"fmt"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -67,11 +69,15 @@ func (controller *Controller) AddItemToOrder(c echo.Context) error {
 	var item = new(request.OrderItemRequest)
 
 	claims := middleware.GetTokenFromContext(c)
+	order, _ := controller.service.GetOrderByUserID(claims.ID)
 
 	if err := c.Bind(item); err != nil {
 		return c.JSON(common.NewErrorBusinessResponse(err))
 	}
-	err := controller.service.AddItemToOrder(claims.ID, item.ToProductSpec())
+
+	fmt.Println(item.ToProductSpec())
+
+	err := controller.service.AddItemToOrder(order.ID, item.ToProductSpec())
 	if err != nil {
 		return c.JSON(common.NewErrorBusinessResponse(err))
 	}
@@ -79,5 +85,41 @@ func (controller *Controller) AddItemToOrder(c echo.Context) error {
 }
 
 func (controller *Controller) UpdateItemInOrder(c echo.Context) error {
+	var item = new(request.OrderItemRequest)
+
+	if err := c.Bind(item); err != nil {
+		return c.JSON(common.NewErrorBusinessResponse(err))
+	}
+
+	claims := middleware.GetTokenFromContext(c)
+
+	order, _ := controller.service.GetOrderByUserID(claims.ID)
+
+	// fmt.Println(item.ToProductSpec())
+
+	err := controller.service.UpdateItemInOrder(order.ID, item.ToProductSpec())
+
+	if err != nil {
+		return c.JSON(common.NewErrorBusinessResponse(err))
+	}
+
+	return c.JSON(common.NewSuccessResponseWithoutData())
+}
+
+func (controller *Controller) RemoveItemInOrder(c echo.Context) error {
+	claims := middleware.GetTokenFromContext(c)
+
+	order, err1 := controller.service.GetOrderByUserID(claims.ID)
+	productID, err2 := strconv.Atoi(c.Param("productid"))
+
+	if err1 != nil || err2 != nil {
+		return c.JSON(common.NewBadRequestResponse())
+	}
+
+	err := controller.service.RemoveItemInOrder(order.ID, productID)
+	if err != nil {
+		return c.JSON(common.NewErrorBusinessResponse(err))
+	}
+	return c.JSON(common.NewSuccessResponseWithoutData())
 
 }

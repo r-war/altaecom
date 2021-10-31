@@ -4,6 +4,7 @@ import (
 	admin "AltaEcom/modules/admin"
 	category "AltaEcom/modules/category"
 	order "AltaEcom/modules/order"
+	orderitem "AltaEcom/modules/orderitem"
 	product "AltaEcom/modules/product"
 	user "AltaEcom/modules/user"
 
@@ -17,5 +18,6 @@ func InitMigrate(db *gorm.DB) {
 		&admin.Admin{},
 		&user.User{},
 		&order.Order{},
+		&orderitem.OrderItem{},
 	)
 }

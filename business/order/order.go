@@ -46,9 +46,15 @@ func NewOrderItem(
 }
 
 func ModifyOrderItem(
+	ID int,
+	ProductID int,
 	Qty int,
+	Price int,
 ) OrderItem {
 	return OrderItem{
+		ID:        ID,
+		ProductID: ProductID,
+		Price:     Price,
 		Qty:       Qty,
 		UpdatedAt: time.Now(),
 	}
