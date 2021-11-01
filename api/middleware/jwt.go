@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"AltaEcom/config"
-	"fmt"
 
 	"github.com/golang-jwt/jwt"
 
@@ -25,7 +24,7 @@ type contextKey struct {
 }
 
 func JWTMiddleware(cfg config.AppConfig) echo.MiddlewareFunc {
-	fmt.Println(cfg.JWTConfig, "ok")
+
 	return middleware.JWTWithConfig(middleware.JWTConfig{
 		SigningMethod: "HS256",
 		Claims:        &JwtCustomClaims{},

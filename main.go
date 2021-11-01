@@ -9,6 +9,7 @@ import (
 	categoryController "AltaEcom/api/category"
 	orderController "AltaEcom/api/order"
 	productController "AltaEcom/api/product"
+	transcationController "AltaEcom/api/transcation"
 	userController "AltaEcom/api/user"
 
 	adminService "AltaEcom/business/admin"
@@ -16,6 +17,7 @@ import (
 	categoryService "AltaEcom/business/category"
 	orderService "AltaEcom/business/order"
 	productService "AltaEcom/business/product"
+	transcationService "AltaEcom/business/transcation"
 	userService "AltaEcom/business/user"
 
 	adminRepository "AltaEcom/modules/admin"
@@ -23,6 +25,7 @@ import (
 	orderRepo "AltaEcom/modules/order"
 	orderItemRepo "AltaEcom/modules/orderitem"
 	productRepository "AltaEcom/modules/product"
+	transcationRepository "AltaEcom/modules/transcation"
 	userRepository "AltaEcom/modules/user"
 
 	"fmt"
@@ -107,6 +110,10 @@ func main() {
 
 	orderController := orderController.NewController(orderService)
 
+	transcationRepo := transcationRepository.NewRepository(dbConnect)
+	transcationService := transcationService.NewService(transcationRepo, orderService)
+	transcationController := transcationController.NewController(transcationService)
+
 	e := echo.New()
 	api.RegisterPath(
 		e,
@@ -115,6 +122,7 @@ func main() {
 		productController,
 		categoryController,
 		orderController,
+		transcationController,
 		cfg,
 	)
 

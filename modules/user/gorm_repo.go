@@ -17,7 +17,7 @@ type User struct {
 	Name       string    `gorm:"name"`
 	Username   string    `gorm:"username;index:idx_username,unique"`
 	Password   string    `gorm:"password"`
-	Address    string    `gorm: "address" `
+	Address    string    `gorm:"address"`
 	CreatedAt  time.Time `gorm:"created_at"`
 	CreatedBy  string    `gorm:"created_by"`
 	ModifiedAt time.Time `gorm:"modified_at"`
@@ -140,7 +140,6 @@ func (repo *GormRepository) UpdateUser(user user.User, currentVersion int) error
 
 	return nil
 }
-
 
 //UpdateItem Address Update existing item in database
 func (repo *GormRepository) UpdateUserAddress(user user.User, currentVersion int) error {

@@ -6,6 +6,7 @@ import (
 	"AltaEcom/api/middleware"
 	"AltaEcom/api/order"
 	"AltaEcom/api/product"
+	"AltaEcom/api/transcation"
 	"AltaEcom/api/user"
 	"AltaEcom/config"
 
@@ -19,6 +20,7 @@ func RegisterPath(
 	productController *product.Controller,
 	categoryController *category.Controller,
 	orderController *order.Controller,
+	transcationController *transcation.Controller,
 	cfg *config.AppConfig,
 ) {
 	if authController == nil || userController == nil {
@@ -55,11 +57,17 @@ func RegisterPath(
 
 	orderV1 := e.Group("api/cart")
 	orderV1.Use(middleware.JWTMiddleware(*cfg))
-	orderV1.GET("", orderController.GetOrderByUserID)
+	orderV1.GET("", orderController.GetOrderItemByUserID)
 	orderV1.POST("", orderController.NewOrderByUserID)
 	orderV1.POST("/add", orderController.AddItemToOrder)
 	orderV1.POST("/update", orderController.UpdateItemInOrder)
 	orderV1.DELETE("/delete/:productid", orderController.RemoveItemInOrder)
+
+	transcationV1 := e.Group("api/checkout")
+	transcationV1.Use(middleware.JWTMiddleware(*cfg))
+	transcationV1.GET("", transcationController.GetAllTranscation)
+	transcationV1.POST("", transcationController.CreateTranscation)
+	transcationV1.POST("/status/:id", transcationController.UpdateTranscation)
 
 	//health check
 	e.GET("/health", func(c echo.Context) error {

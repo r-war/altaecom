@@ -6,6 +6,7 @@ import (
 	order "AltaEcom/modules/order"
 	orderitem "AltaEcom/modules/orderitem"
 	product "AltaEcom/modules/product"
+	transcation "AltaEcom/modules/transcation"
 	user "AltaEcom/modules/user"
 
 	"gorm.io/gorm"
@@ -19,5 +20,6 @@ func InitMigrate(db *gorm.DB) {
 		&user.User{},
 		&order.Order{},
 		&orderitem.OrderItem{},
+		&transcation.Transcation{},
 	)
 }

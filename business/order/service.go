@@ -88,3 +88,7 @@ func (s *service) UpdateItemInOrder(orderID int, product *OrderItemSpec) error {
 func (s *service) RemoveItemInOrder(orderID int, productID int) error {
 	return s.repoOrderItem.RemoveItemInOrder(orderID, productID)
 }
+
+func (s *service) ChangeOrderStatus(id int, ischeckout bool) error {
+	return s.repo.ChangeOrderStatus(id, ischeckout)
+}

@@ -48,8 +48,6 @@ func NewRepository(db *gorm.DB) *Repository {
 func (repo *Repository) GetOrderByUserID(userID int) (*order.Order, error) {
 	var cart Order
 
-	fmt.Println(userID)
-
 	err := repo.DB.First(&cart, "status = false and user_id = ? ", userID).Error
 
 	if err != nil {
@@ -74,5 +72,23 @@ func (repo *Repository) NewOrderByUserID(userID int, createdAt time.Time) (*orde
 	}
 
 	return cart.ToOrder(), nil
+}
 
+func (repo *Repository) ChangeOrderStatus(id int, ischeckout bool) error {
+	var cart Order
+	err := repo.DB.First(&cart, "user_id = ? ", id).Error
+
+	if err != nil {
+		return err
+	}
+	fmt.Println(&cart)
+	err = repo.DB.Model(&cart).Updates(Order{
+		Status: ischeckout,
+	}).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

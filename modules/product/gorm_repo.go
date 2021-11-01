@@ -99,7 +99,7 @@ func (repo *Repository) GetProducts() ([]product.Product, error) {
 func (repo *Repository) FindProductByid(id int) (*product.Product, error) {
 	var product Product
 
-	err := repo.DB.First(product, "id = ?", id).Error
+	err := repo.DB.First(&product, "id = ?", id).Error
 	if err != nil {
 		return nil, err
 	}
@@ -118,12 +118,12 @@ func (repo *Repository) InsertProduct(product product.Product) error {
 
 func (repo *Repository) UpdateProduct(id int, product product.Product) error {
 	var productData Product
-	err := repo.DB.Find(productData, "id = ?", id).Error
+	err := repo.DB.Find(&productData, "id = ?", id).Error
 
 	if err != nil {
 		return err
 	}
-	err = repo.DB.Model(productData).Updates(Product{
+	err = repo.DB.Model(&productData).Updates(Product{
 		Name:        product.Name,
 		CategoryId:  product.CategoryId,
 		Price:       product.Price,
